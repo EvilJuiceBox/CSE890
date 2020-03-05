@@ -15,6 +15,9 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -34,6 +37,7 @@ import org.opencv.imgproc.Imgproc;
  *
  */
 public class SecureIconLauncher{
+	
 	public static void main(String [] args) {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		addTrayIcon();
@@ -84,6 +88,16 @@ public class SecureIconLauncher{
 		
 		//full screen
 		setFrameProperties(frame);
+		
+		Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				updateIconLocation(certificate, icon);
+			}
+		};
+		
+		ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+		executorService.scheduleAtFixedRate(runnable, 0, 3, TimeUnit.SECONDS);
 	}
 	
 	
@@ -204,8 +218,5 @@ public class SecureIconLauncher{
 		}
 		Mat result = Imgcodecs.imdecode(new MatOfByte(byteArrayOutputStream.toByteArray()), Imgcodecs.IMREAD_UNCHANGED);
 		return result;	
-	}
-
-
-	
+	}	
 }
