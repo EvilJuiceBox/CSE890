@@ -34,46 +34,27 @@ import org.opencv.imgproc.Imgproc;
  *
  */
 public class SecureIconLauncher{
-	
 	public static void main(String [] args) {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		addTrayIcon();
-		Mat secureIcon = Imgcodecs.imread("./res/secure.png");
 		
 		
 		JFrame frame= new JFrame();
 		JLabel certificate = new JLabel();
 		certificate.setIcon(new ImageIcon(SecureIconLauncher.class.getResource("certificate.png")));
 		certificate.setVisible(false);
+		JButton icon = new JButton(new ImageIcon(SecureIconLauncher.class.getResource("secure.png")));
+		icon.setBorderPainted(false);
 		
-		Dimension location = new Dimension();
+		updateIconLocation(certificate, icon);
+			
+
 		try {
-			location = templateMatch(Imgcodecs.imread("./res/secure.png"));
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		certificate.setBounds((int) location.getWidth(), (int) location.getHeight() + secureIcon.height(), 320, 310);
-		frame.add(certificate);
-		
-		try {
-
-			JButton icon = new JButton("", new ImageIcon(SecureIconLauncher.class.getResource("secure.png"), "icon"));
-			
-
-			icon.setBorderPainted(false);
-			icon.setBounds((int) location.getWidth(), (int) location.getHeight() , 15, 15); //change size of this icon based on screen, need to find exact size.
-
-			System.out.println("Target is found at: " + location.getWidth() + ", " + location.getHeight());
-			
-			frame.add(icon);
-			
 			icon.addActionListener(new ActionListener() {
-				
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					System.out.println("button pressed");
+					System.out.println("Certificate is located at: " + certificate.getX() + ", " + certificate.getY());
 					if(certificate.isVisible())
 					{
 						certificate.setVisible(false);
@@ -82,7 +63,6 @@ public class SecureIconLauncher{
 					}
 				}
 			});
-			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -97,16 +77,33 @@ public class SecureIconLauncher{
 		testLabel.setForeground(Color.GREEN);
 		
 		frame.add(testLabel);
-		
 
+		//adding the components to the screen
+		frame.add(icon);
+		frame.add(certificate);
+		
 		//full screen
 		setFrameProperties(frame);
 	}
 	
 	
-	private static void updateIconLocation()
+	private static void updateIconLocation(JLabel certificate, JButton icon)
 	{
+		Mat secureIcon = Imgcodecs.imread("./res/secure.png");
 		
+		
+		Dimension location = new Dimension();
+		try {
+			location = templateMatch(Imgcodecs.imread("./res/secure.png"));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		icon.setBounds((int) location.getWidth(), (int) location.getHeight() , 15, 15); //change size of this icon based on screen, need to find exact size.
+		certificate.setBounds((int) location.getWidth(), (int) location.getHeight() + secureIcon.height(), 320, 310);
+		
+		System.out.println("Target is found at: " + location.getWidth() + ", " + location.getHeight());
 	}
 	
 	
@@ -126,6 +123,9 @@ public class SecureIconLauncher{
 		frame.setAlwaysOnTop(true);
 		frame.setType(javax.swing.JFrame.Type.UTILITY);
 		
+		//added this line to allow certificate to freeflow.
+		frame.setLayout(null);
+		
 		frame.setVisible(true);
 	}
 	
@@ -136,7 +136,7 @@ public class SecureIconLauncher{
 		if (SystemTray.isSupported()) {
 		    SystemTray tray = SystemTray.getSystemTray();
 		    //not working yet??
-		    Image image = Toolkit.getDefaultToolkit().getImage("./res/secure.png");
+		    Image image = Toolkit.getDefaultToolkit().getImage("./res/emptyIcon.png");
 
 		    
 		    ActionListener clickListener = new ActionListener() {
@@ -179,7 +179,6 @@ public class SecureIconLauncher{
 		//ImageIO.write(screenshot, "png", new File("./screenshot.png"));
 		
 		Mat screenshotMatrix = bufferedImageToMat(screenshot);
-		
 		Mat resImg = new Mat(screenshotMatrix.rows(), screenshotMatrix.cols(), CvType.CV_32FC1);
 
 		
