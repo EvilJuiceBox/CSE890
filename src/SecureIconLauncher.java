@@ -96,7 +96,7 @@ public class SecureIconLauncher{
 		};
 		
 		ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
-		executorService.scheduleAtFixedRate(runnable, 0, 3, TimeUnit.SECONDS);
+		executorService.scheduleAtFixedRate(runnable, 0, 3, TimeUnit.MILLISECONDS);
 	}
 	
 	
@@ -109,14 +109,22 @@ public class SecureIconLauncher{
 		try {
 			location = templateMatch(Imgcodecs.imread("./res/secure.png"));
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		icon.setBounds((int) location.getWidth(), (int) location.getHeight() , 15, 15); //change size of this icon based on screen, need to find exact size.
-		certificate.setBounds((int) location.getWidth(), (int) location.getHeight() + secureIcon.height(), 320, 310);
+		if(location != null)
+		{
+			icon.setBounds((int) location.getWidth(), (int) location.getHeight() , secureIcon.width(), secureIcon.height()); //change size of this icon based on screen, need to find exact size.
+			certificate.setBounds((int) location.getWidth(), (int) location.getHeight() + secureIcon.height(), 320, 310);
+			System.out.println("Target is found at: " + location.getWidth() + ", " + location.getHeight());
+			
+			icon.setVisible(true);
+		} else 
+		{
+			icon.setVisible(false);
+			certificate.setVisible(false);
+		}
 		
-		System.out.println("Target is found at: " + location.getWidth() + ", " + location.getHeight());
 	}
 	
 	
@@ -201,8 +209,18 @@ public class SecureIconLauncher{
 		Core.normalize(resImg, resImg, 0, 1, Core.NORM_MINMAX, -1, new Mat());
 		Core.MinMaxLocResult mmr = Core.minMaxLoc(resImg);
 		
-		Dimension result = new Dimension((int) mmr.minLoc.x, (int) mmr.minLoc.y);
-		return result;
+		
+		System.out.println("minval: " + mmr.minVal + ", maxVal: " + mmr.maxVal);
+		
+		if(mmr.minVal < 0)
+		{
+			Dimension result = new Dimension((int) mmr.minLoc.x, (int) mmr.minLoc.y);
+			return result;
+		} else {
+			//return new Dimension(-1, -1);
+			return null;
+		}
+		
 	}
 	
 	private static Mat bufferedImageToMat(BufferedImage inputImg)
