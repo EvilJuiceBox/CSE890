@@ -14,7 +14,6 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -130,7 +129,6 @@ public class SecureIconLauncher{
 		
 		//removes title bar
 		frame.setUndecorated(true);
-		
 		
 		frame.getContentPane().setBackground(new Color(1.0f,1.0f,1.0f,0.0f));
 		frame.setBackground(new Color(1.0f,1.0f,1.0f,0.0f));
